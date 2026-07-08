@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retail Analytics - Business Report (Sample)</title>
+<meta name="description" content="A real, generated sample of the Retail Analytics Platform's business report: revenue trend, top products, top customers, and channel performance.">
+<style>
+body { font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; margin: 2.5rem;
+       color: #0b0b0b; background: #f9f9f7; }
+h1 { margin-bottom: 0.25rem; }
+.subtitle { color: #52514e; margin-top: 0; margin-bottom: 2.5rem; }
+.report { background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 6px;
+          padding: 1.5rem 1.75rem; margin-bottom: 2rem; }
+.report h2 { margin-top: 0; font-size: 1.15rem; }
+table { border-collapse: collapse; margin-top: 1rem; width: 100%; font-size: 13.5px; }
+th, td { border-bottom: 1px solid #e1e0d9; padding: 6px 10px; text-align: right;
+         font-variant-numeric: tabular-nums; }
+th { color: #52514e; font-weight: 600; }
+td:first-child, th:first-child { text-align: left; font-variant-numeric: normal; }
+
+/* Chart chrome */
+.chart-empty { color: #898781; font-style: italic; }
+.chart-label { font-size: 12px; fill: #52514e; }
+.chart-value { font-size: 12px; fill: #0b0b0b; }
+.chart-baseline { stroke: #c3c2b7; stroke-width: 1; }
+.chart-grid { stroke: #e1e0d9; stroke-width: 1; }
+.chart-tick { font-size: 11px; fill: #898781; }
+.chart-line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.chart-endlabel { font-size: 12px; font-weight: 600; fill: #0b0b0b; }
+.chart-crosshair { stroke: #c3c2b7; stroke-width: 1; opacity: 0; pointer-events: none; }
+.chart-hit { fill: transparent; }
+.chart-bar path { transition: opacity .1s ease; }
+.chart-bar:hover path, .chart-bar:focus path { opacity: 0.7; }
+.chart-bar:focus { outline: none; }
+.chart-legend { display: flex; gap: 16px; margin-bottom: 4px; font-size: 12px; color: #52514e; }
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.chart-tooltip {
+  position: fixed; pointer-events: none; background: #0b0b0b; color: #fff;
+  font-size: 12.5px; padding: 6px 10px; border-radius: 4px; opacity: 0;
+  transform: translate(-50%, -100%); transition: opacity .1s ease; z-index: 100;
+  white-space: nowrap;
+}
+</style>
+</head><body>
+<p style="margin-bottom:1.5rem;"><a href="case-study.html" style="font-size:13px;">&larr; Back to case study</a></p>
+<h1>Retail Analytics - Business Report</h1>
+<p class="subtitle">Sample output from <code>python -m reports.generate</code>, generated against the loaded warehouse. Total revenue $3.2M &middot; total profit $1.5M, across the loaded history.</p>
+<div class="report"><h2>Monthly Revenue Trend</h2>
+    <div class="chart-wrap">
+      <div class="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#2a78d6"></span>Revenue</span><span class="legend-item"><span class="legend-swatch" style="background:#1baf7a"></span>Profit</span></div>
+      <svg class="chart" viewBox="0 0 640 280" width="100%" height="280"
+           preserveAspectRatio="xMinYMin meet" role="img" aria-label="Line chart">
+        <line x1="56" y1="252.0" x2="620" y2="252.0" class="chart-grid"/><line x1="56" y1="193.0" x2="620" y2="193.0" class="chart-grid"/><line x1="56" y1="134.0" x2="620" y2="134.0" class="chart-grid"/><line x1="56" y1="75.0" x2="620" y2="75.0" class="chart-grid"/><line x1="56" y1="16.0" x2="620" y2="16.0" class="chart-grid"/>
+        <line x1="56" y1="252.0" x2="620" y2="252.0" class="chart-baseline"/>
+        <text x="48" y="256.0" text-anchor="end" class="chart-tick">$0</text><text x="48" y="197.0" text-anchor="end" class="chart-tick">$50.0K</text><text x="48" y="138.0" text-anchor="end" class="chart-tick">$100.0K</text><text x="48" y="79.0" text-anchor="end" class="chart-tick">$150.0K</text><text x="48" y="20.0" text-anchor="end" class="chart-tick">$200.0K</text>
+        <text x="56.0" y="272" text-anchor="middle" class="chart-tick">2022-01</text><text x="152.7" y="272" text-anchor="middle" class="chart-tick">2022-07</text><text x="249.4" y="272" text-anchor="middle" class="chart-tick">2023-01</text><text x="346.1" y="272" text-anchor="middle" class="chart-tick">2023-07</text><text x="442.7" y="272" text-anchor="middle" class="chart-tick">2024-01</text><text x="539.4" y="272" text-anchor="middle" class="chart-tick">2024-07</text><text x="620.0" y="272" text-anchor="middle" class="chart-tick">2024-12</text>
+        <polyline points="56.0,145.2 72.1,153.7 88.2,145.3 104.3,144.3 120.5,134.7 136.6,141.3 152.7,126.2 168.8,157.9 184.9,156.5 201.0,148.4 217.1,175.8 233.3,158.7 249.4,97.7 265.5,161.7 281.6,162.3 297.7,164.0 313.8,134.5 329.9,149.7 346.1,136.4 362.2,137.6 378.3,143.8 394.4,154.3 410.5,155.6 426.6,144.9 442.7,155.0 458.9,148.2 475.0,130.4 491.1,126.6 507.2,127.3 523.3,148.7 539.4,132.4 555.5,161.4 571.7,152.2 587.8,151.8 603.9,133.7 620.0,159.9" class="chart-line" style="stroke:#2a78d6"/><circle cx="620.0" cy="159.9" r="4" style="fill:#2a78d6"/><polyline points="56.0,201.3 72.1,205.6 88.2,200.7 104.3,202.4 120.5,197.4 136.6,201.2 152.7,192.6 168.8,209.5 184.9,206.6 201.0,203.7 217.1,215.9 233.3,208.9 249.4,185.6 265.5,210.7 281.6,210.3 297.7,211.0 313.8,197.3 329.9,204.0 346.1,199.9 362.2,199.0 378.3,202.1 394.4,206.4 410.5,208.6 426.6,202.8 442.7,207.6 458.9,202.9 475.0,198.9 491.1,195.1 507.2,196.0 523.3,206.0 539.4,197.3 555.5,209.2 571.7,206.8 587.8,205.4 603.9,198.9 620.0,207.7" class="chart-line" style="stroke:#1baf7a"/><circle cx="620.0" cy="207.7" r="4" style="fill:#1baf7a"/>
+        <text x="616.0" y="163.9" class="chart-endlabel">Revenue</text><text x="616.0" y="211.7" class="chart-endlabel">Profit</text>
+        <line class="chart-crosshair" x1="0" y1="16" x2="0" y2="252"/>
+        <rect x="47.9" y="16" width="16.1" height="236" class="chart-hit" data-x="56.0" data-cat="2022-01" data-s0="Revenue: $90.5K" data-s1="Profit: $43.0K"/><rect x="64.1" y="16" width="16.1" height="236" class="chart-hit" data-x="72.1" data-cat="2022-02" data-s0="Revenue: $83.3K" data-s1="Profit: $39.3K"/><rect x="80.2" y="16" width="16.1" height="236" class="chart-hit" data-x="88.2" data-cat="2022-03" data-s0="Revenue: $90.4K" data-s1="Profit: $43.5K"/><rect x="96.3" y="16" width="16.1" height="236" class="chart-hit" data-x="104.3" data-cat="2022-04" data-s0="Revenue: $91.3K" data-s1="Profit: $42.0K"/><rect x="112.4" y="16" width="16.1" height="236" class="chart-hit" data-x="120.5" data-cat="2022-05" data-s0="Revenue: $99.4K" data-s1="Profit: $46.2K"/><rect x="128.5" y="16" width="16.1" height="236" class="chart-hit" data-x="136.6" data-cat="2022-06" data-s0="Revenue: $93.8K" data-s1="Profit: $43.0K"/><rect x="144.6" y="16" width="16.1" height="236" class="chart-hit" data-x="152.7" data-cat="2022-07" data-s0="Revenue: $106.6K" data-s1="Profit: $50.3K"/><rect x="160.7" y="16" width="16.1" height="236" class="chart-hit" data-x="168.8" data-cat="2022-08" data-s0="Revenue: $79.8K" data-s1="Profit: $36.1K"/><rect x="176.9" y="16" width="16.1" height="236" class="chart-hit" data-x="184.9" data-cat="2022-09" data-s0="Revenue: $80.9K" data-s1="Profit: $38.4K"/><rect x="193.0" y="16" width="16.1" height="236" class="chart-hit" data-x="201.0" data-cat="2022-10" data-s0="Revenue: $87.8K" data-s1="Profit: $41.0K"/><rect x="209.1" y="16" width="16.1" height="236" class="chart-hit" data-x="217.1" data-cat="2022-11" data-s0="Revenue: $64.6K" data-s1="Profit: $30.6K"/><rect x="225.2" y="16" width="16.1" height="236" class="chart-hit" data-x="233.3" data-cat="2022-12" data-s0="Revenue: $79.1K" data-s1="Profit: $36.5K"/><rect x="241.3" y="16" width="16.1" height="236" class="chart-hit" data-x="249.4" data-cat="2023-01" data-s0="Revenue: $130.7K" data-s1="Profit: $56.3K"/><rect x="257.4" y="16" width="16.1" height="236" class="chart-hit" data-x="265.5" data-cat="2023-02" data-s0="Revenue: $76.5K" data-s1="Profit: $35.0K"/><rect x="273.5" y="16" width="16.1" height="236" class="chart-hit" data-x="281.6" data-cat="2023-03" data-s0="Revenue: $76.0K" data-s1="Profit: $35.4K"/><rect x="289.7" y="16" width="16.1" height="236" class="chart-hit" data-x="297.7" data-cat="2023-04" data-s0="Revenue: $74.6K" data-s1="Profit: $34.8K"/><rect x="305.8" y="16" width="16.1" height="236" class="chart-hit" data-x="313.8" data-cat="2023-05" data-s0="Revenue: $99.6K" data-s1="Profit: $46.4K"/><rect x="321.9" y="16" width="16.1" height="236" class="chart-hit" data-x="329.9" data-cat="2023-06" data-s0="Revenue: $86.7K" data-s1="Profit: $40.6K"/><rect x="338.0" y="16" width="16.1" height="236" class="chart-hit" data-x="346.1" data-cat="2023-07" data-s0="Revenue: $98.0K" data-s1="Profit: $44.2K"/><rect x="354.1" y="16" width="16.1" height="236" class="chart-hit" data-x="362.2" data-cat="2023-08" data-s0="Revenue: $96.9K" data-s1="Profit: $44.9K"/><rect x="370.2" y="16" width="16.1" height="236" class="chart-hit" data-x="378.3" data-cat="2023-09" data-s0="Revenue: $91.7K" data-s1="Profit: $42.3K"/><rect x="386.3" y="16" width="16.1" height="236" class="chart-hit" data-x="394.4" data-cat="2023-10" data-s0="Revenue: $82.8K" data-s1="Profit: $38.7K"/><rect x="402.5" y="16" width="16.1" height="236" class="chart-hit" data-x="410.5" data-cat="2023-11" data-s0="Revenue: $81.7K" data-s1="Profit: $36.8K"/><rect x="418.6" y="16" width="16.1" height="236" class="chart-hit" data-x="426.6" data-cat="2023-12" data-s0="Revenue: $90.8K" data-s1="Profit: $41.7K"/><rect x="434.7" y="16" width="16.1" height="236" class="chart-hit" data-x="442.7" data-cat="2024-01" data-s0="Revenue: $82.2K" data-s1="Profit: $37.7K"/><rect x="450.8" y="16" width="16.1" height="236" class="chart-hit" data-x="458.9" data-cat="2024-02" data-s0="Revenue: $88.0K" data-s1="Profit: $41.6K"/><rect x="466.9" y="16" width="16.1" height="236" class="chart-hit" data-x="475.0" data-cat="2024-03" data-s0="Revenue: $103.1K" data-s1="Profit: $45.0K"/><rect x="483.0" y="16" width="16.1" height="236" class="chart-hit" data-x="491.1" data-cat="2024-04" data-s0="Revenue: $106.3K" data-s1="Profit: $48.2K"/><rect x="499.1" y="16" width="16.1" height="236" class="chart-hit" data-x="507.2" data-cat="2024-05" data-s0="Revenue: $105.7K" data-s1="Profit: $47.4K"/><rect x="515.3" y="16" width="16.1" height="236" class="chart-hit" data-x="523.3" data-cat="2024-06" data-s0="Revenue: $87.6K" data-s1="Profit: $39.0K"/><rect x="531.4" y="16" width="16.1" height="236" class="chart-hit" data-x="539.4" data-cat="2024-07" data-s0="Revenue: $101.3K" data-s1="Profit: $46.4K"/><rect x="547.5" y="16" width="16.1" height="236" class="chart-hit" data-x="555.5" data-cat="2024-08" data-s0="Revenue: $76.8K" data-s1="Profit: $36.3K"/><rect x="563.6" y="16" width="16.1" height="236" class="chart-hit" data-x="571.7" data-cat="2024-09" data-s0="Revenue: $84.6K" data-s1="Profit: $38.3K"/><rect x="579.7" y="16" width="16.1" height="236" class="chart-hit" data-x="587.8" data-cat="2024-10" data-s0="Revenue: $84.9K" data-s1="Profit: $39.5K"/><rect x="595.8" y="16" width="16.1" height="236" class="chart-hit" data-x="603.9" data-cat="2024-11" data-s0="Revenue: $100.3K" data-s1="Profit: $45.0K"/><rect x="611.9" y="16" width="16.1" height="236" class="chart-hit" data-x="620.0" data-cat="2024-12" data-s0="Revenue: $78.1K" data-s1="Profit: $37.6K"/>
+      </svg>
+    </div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>month</th>
+      <th>orders</th>
+      <th>revenue</th>
+      <th>cogs</th>
+      <th>profit</th>
+      <th>margin_pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2022-01-01</td>
+      <td>199</td>
+      <td>90,471.84</td>
+      <td>47,470.43</td>
+      <td>43,001.41</td>
+      <td>47.53</td>
+    </tr>
+    <tr>
+      <td>2022-02-01</td>
+      <td>181</td>
+      <td>83,313.29</td>
+      <td>43,965.78</td>
+      <td>39,347.51</td>
+      <td>47.23</td>
+    </tr>
+    <tr>
+      <td>2022-03-01</td>
+      <td>219</td>
+      <td>90,420.96</td>
+      <td>46,947.43</td>
+      <td>43,473.53</td>
+      <td>48.08</td>
+    </tr>
+    <tr>
+      <td>2022-04-01</td>
+      <td>201</td>
+      <td>91,273.76</td>
+      <td>49,274.23</td>
+      <td>41,999.53</td>
+      <td>46.01</td>
+    </tr>
+    <tr>
+      <td>2022-05-01</td>
+      <td>201</td>
+      <td>99,372.82</td>
+      <td>53,139.96</td>
+      <td>46,232.86</td>
+      <td>46.52</td>
+    </tr>
+    <tr>
+      <td>2022-06-01</td>
+      <td>187</td>
+      <td>93,834.33</td>
+      <td>50,821.69</td>
+      <td>43,012.64</td>
+      <td>45.84</td>
+    </tr>
+    <tr>
+      <td>2022-07-01</td>
+      <td>208</td>
+      <td>106,573.00</td>
+      <td>56,237.49</td>
+      <td>50,335.51</td>
+      <td>47.23</td>
+    </tr>
+    <tr>
+      <td>2022-08-01</td>
+      <td>213</td>
+      <td>79,753.59</td>
+      <td>43,703.53</td>
+      <td>36,050.06</td>
+      <td>45.20</td>
+    </tr>
+    <tr>
+      <td>2022-09-01</td>
+      <td>199</td>
+      <td>80,904.66</td>
+      <td>42,465.51</td>
+      <td>38,439.15</td>
+      <td>47.51</td>
+    </tr>
+    <tr>
+      <td>2022-10-01</td>
+      <td>203</td>
+      <td>87,772.00</td>
+      <td>46,818.01</td>
+      <td>40,953.99</td>
+      <td>46.66</td>
+    </tr>
+    <tr>
+      <td>2022-11-01</td>
+      <td>179</td>
+      <td>64,591.56</td>
+      <td>34,030.34</td>
+      <td>30,561.22</td>
+      <td>47.31</td>
+    </tr>
+    <tr>
+      <td>2022-12-01</td>
+      <td>193</td>
+      <td>79,067.98</td>
+      <td>42,548.88</td>
+      <td>36,519.10</td>
+      <td>46.19</td>
+    </tr>
+    <tr>
+      <td>2023-01-01</td>
+      <td>204</td>
+      <td>130,740.21</td>
+      <td>74,472.53</td>
+      <td>56,267.68</td>
+      <td>43.04</td>
+    </tr>
+    <tr>
+      <td>2023-02-01</td>
+      <td>168</td>
+      <td>76,504.11</td>
+      <td>41,483.93</td>
+      <td>35,020.18</td>
+      <td>45.78</td>
+    </tr>
+    <tr>
+      <td>2023-03-01</td>
+      <td>190</td>
+      <td>76,027.30</td>
+      <td>40,676.78</td>
+      <td>35,350.52</td>
+      <td>46.50</td>
+    </tr>
+    <tr>
+      <td>2023-04-01</td>
+      <td>163</td>
+      <td>74,595.32</td>
+      <td>39,844.47</td>
+      <td>34,750.85</td>
+      <td>46.59</td>
+    </tr>
+    <tr>
+      <td>2023-05-01</td>
+      <td>178</td>
+      <td>99,615.99</td>
+      <td>53,240.35</td>
+      <td>46,375.64</td>
+      <td>46.55</td>
+    </tr>
+    <tr>
+      <td>2023-06-01</td>
+      <td>175</td>
+      <td>86,721.44</td>
+      <td>46,078.35</td>
+      <td>40,643.09</td>
+      <td>46.87</td>
+    </tr>
+    <tr>
+      <td>2023-07-01</td>
+      <td>189</td>
+      <td>98,003.15</td>
+      <td>53,824.48</td>
+      <td>44,178.67</td>
+      <td>45.08</td>
+    </tr>
+    <tr>
+      <td>2023-08-01</td>
+      <td>211</td>
+      <td>96,926.36</td>
+      <td>52,032.80</td>
+      <td>44,893.56</td>
+      <td>46.32</td>
+    </tr>
+    <tr>
+      <td>2023-09-01</td>
+      <td>202</td>
+      <td>91,669.86</td>
+      <td>49,367.04</td>
+      <td>42,302.82</td>
+      <td>46.15</td>
+    </tr>
+    <tr>
+      <td>2023-10-01</td>
+      <td>185</td>
+      <td>82,836.53</td>
+      <td>44,170.39</td>
+      <td>38,666.14</td>
+      <td>46.68</td>
+    </tr>
+    <tr>
+      <td>2023-11-01</td>
+      <td>182</td>
+      <td>81,653.21</td>
+      <td>44,840.63</td>
+      <td>36,812.58</td>
+      <td>45.08</td>
+    </tr>
+    <tr>
+      <td>2023-12-01</td>
+      <td>186</td>
+      <td>90,776.15</td>
+      <td>49,069.89</td>
+      <td>41,706.26</td>
+      <td>45.94</td>
+    </tr>
+    <tr>
+      <td>2024-01-01</td>
+      <td>173</td>
+      <td>82,208.45</td>
+      <td>44,546.94</td>
+      <td>37,661.51</td>
+      <td>45.81</td>
+    </tr>
+    <tr>
+      <td>2024-02-01</td>
+      <td>177</td>
+      <td>87,967.30</td>
+      <td>46,334.39</td>
+      <td>41,632.91</td>
+      <td>47.33</td>
+    </tr>
+    <tr>
+      <td>2024-03-01</td>
+      <td>185</td>
+      <td>103,064.83</td>
+      <td>58,049.68</td>
+      <td>45,015.15</td>
+      <td>43.68</td>
+    </tr>
+    <tr>
+      <td>2024-04-01</td>
+      <td>208</td>
+      <td>106,276.24</td>
+      <td>58,085.13</td>
+      <td>48,191.11</td>
+      <td>45.35</td>
+    </tr>
+    <tr>
+      <td>2024-05-01</td>
+      <td>215</td>
+      <td>105,684.48</td>
+      <td>58,246.02</td>
+      <td>47,438.46</td>
+      <td>44.89</td>
+    </tr>
+    <tr>
+      <td>2024-06-01</td>
+      <td>193</td>
+      <td>87,569.52</td>
+      <td>48,547.99</td>
+      <td>39,021.53</td>
+      <td>44.56</td>
+    </tr>
+    <tr>
+      <td>2024-07-01</td>
+      <td>216</td>
+      <td>101,332.06</td>
+      <td>54,946.14</td>
+      <td>46,385.92</td>
+      <td>45.78</td>
+    </tr>
+    <tr>
+      <td>2024-08-01</td>
+      <td>182</td>
+      <td>76,807.88</td>
+      <td>40,518.51</td>
+      <td>36,289.37</td>
+      <td>47.25</td>
+    </tr>
+    <tr>
+      <td>2024-09-01</td>
+      <td>188</td>
+      <td>84,589.73</td>
+      <td>46,249.38</td>
+      <td>38,340.35</td>
+      <td>45.33</td>
+    </tr>
+    <tr>
+      <td>2024-10-01</td>
+      <td>180</td>
+      <td>84,947.80</td>
+      <td>45,477.20</td>
+      <td>39,470.60</td>
+      <td>46.46</td>
+    </tr>
+    <tr>
+      <td>2024-11-01</td>
+      <td>186</td>
+      <td>100,265.54</td>
+      <td>55,304.48</td>
+      <td>44,961.06</td>
+      <td>44.84</td>
+    </tr>
+    <tr>
+      <td>2024-12-01</td>
+      <td>207</td>
+      <td>78,075.36</td>
+      <td>40,496.25</td>
+      <td>37,579.11</td>
+      <td>48.13</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div class="report"><h2>Top 10 Products by Revenue</h2>
+    <svg class="chart" viewBox="0 0 640 330" width="100%" height="330"
+         preserveAspectRatio="xMinYMin meet" role="img" aria-label="Bar chart">
+      <line x1="190" y1="5.0" x2="190" y2="325.0" class="chart-baseline"/>
+      
+        <g class="chart-bar" tabindex="0"
+           data-label="ProBook Flex 360 (PROD-0014)" data-value="$143.7K">
+          <text x="180" y="25.0" text-anchor="end" class="chart-label">ProBook Flex 360 (PROD-…</text>
+          <path d="M 190,10 H 546.0 A 4.0,4.0 0 0 1 550.0,14.0 V 28.0 A 4.0,4.0 0 0 1 546.0,32 H 190 Z" style="fill:#2a78d6"/>
+          <text x="558.0" y="25.0" class="chart-value">$143.7K</text>
+        </g>
+        <g class="chart-bar" tabindex="0"
+           data-label="CloudSlate X1 Carbon (PROD-0016)" data-value="$143.5K">
+          <text x="180" y="57.0" text-anchor="end" class="chart-label">CloudSlate X1 Carbon (P…</text>
+          <path d="M 190,42 H 545.6 A 4.0,4.0 0 0 1 549.6,46.0 V 60.0 A 4.0,4.0 0 0 1 545.6,64 H 190 Z" style="fill:#2a78d6"/>
+          <text x="557.6" y="57.0" class="chart-value">$143.5K</text>
+        </g>
+        <g class="chart-bar" tabindex="0"
+           data-label="ProBook Air 13 (PROD-0012)" data-value="$138.0K">
+          <text x="180" y="89.0" text-anchor="end" class="chart-label">ProBook Air 13 (PROD-00…</text>
+          <path d="M 190,74 H 531.7 A 4.0,4.0 0 0 1 535.7,78.0 V 92.0 A 4.0,4.0 0 0 1 531.7,96 H 190 Z" style="fill:#2a78d6"/>
+          <text x="543.7" y="89.0" class="chart-value">$138.0K</text>
+        </g>
+        <g class="chart-bar" tabindex="0"
+           data-label="ProBook Studio Pro (PROD-0013)" data-value="$124.9K">
+          <text x="180" y="121.0" text-anchor="end" class="chart-label">ProBook Studio Pro (PRO…</text>
+          <path d="M 190,106 H 499.0 A 4.0,4.0 0 0 1 503.0,110.0 V 124.0 A 4.0,4.0 0 0 1 499.0,128 H 190 Z" style="fill:#2a78d6"/>
+          <text x="511.0" y="121.0" class="chart-value">$124.9K</text>
+        </g>
+        <g class="chart-bar" tabindex="0"
+           data-label="ProBook Elite 15 (PROD-0011)" data-value="$110.5K">
+          <text x="180" y="153.0" text-anchor="end" class="chart-label">ProBook Elite 15 (PROD-…</text>
+          <path d="M 190,138 H 462.9 A 4.0,4.0 0 0 1 466.9,142.0 V 156.0 A 4.0,4.0 0 0 1 462.9,160 H 190 Z" style="fill:#2a78d6"/>
+          <text x="474.9" y="153.0" class="chart-value">$110.5K</text>
+        </g>
+        <g class="chart-bar" tabindex="0"
+           data-label="CloudSlate X1 Carbon (PROD-0019)" data-value="$105.7K">
+          <text x="180" y="185.0" text-anchor="end" class="chart-label">CloudSlate X1 Carbon (P…</text>
+          <path d="M 190,170 H 450.9 A 4.0,4.0 0 0 1 454.9,174.0 V 188.0 A 4.0,4.0 0 0 1 450.9,192 H 190 Z" style="fill:#2a78d6"/>
+          <text x="462.9" y="185.0" class="chart-value">$105.7K</text>
+        </g>
+        <g class="chart-bar" tabindex="0"
+           data-label="NovaPixel Galaxy S (PROD-0006)" data-value="$103.9K">
+          <text x="180" y="217.0" text-anchor="end" class="chart-label">NovaPixel Galaxy S (PRO…</text>
+          <path d="M 190,202 H 446.3 A 4.0,4.0 0 0 1 450.3,206.0 V 220.0 A 4.0,4.0 0 0 1 446.3,224 H 190 Z" style="fill:#2a78d6"/>
+          <text x="458.3" y="217.0" class="chart-value">$103.9K</text>
+        </g>
+        <g class="chart-bar" tabindex="0"
+           data-label="CloudSlate WorkStation Pro (PROD-0018)" data-value="$102.5K">
+          <text x="180" y="249.0" text-anchor="end" class="chart-label">CloudSlate WorkStation …</text>
+          <path d="M 190,234 H 442.7 A 4.0,4.0 0 0 1 446.7,238.0 V 252.0 A 4.0,4.0 0 0 1 442.7,256 H 190 Z" style="fill:#2a78d6"/>
+          <text x="454.7" y="249.0" class="chart-value">$102.5K</text>
+        </g>
+        <g class="chart-bar" tabindex="0"
+           data-label="NovaPixel Galaxy S (PROD-0009)" data-value="$99.4K">
+          <text x="180" y="281.0" text-anchor="end" class="chart-label">NovaPixel Galaxy S (PRO…</text>
+          <path d="M 190,266 H 435.2 A 4.0,4.0 0 0 1 439.2,270.0 V 284.0 A 4.0,4.0 0 0 1 435.2,288 H 190 Z" style="fill:#2a78d6"/>
+          <text x="447.2" y="281.0" class="chart-value">$99.4K</text>
+        </g>
+        <g class="chart-bar" tabindex="0"
+           data-label="NovaPixel Edge Pro (PROD-0007)" data-value="$97.6K">
+          <text x="180" y="313.0" text-anchor="end" class="chart-label">NovaPixel Edge Pro (PRO…</text>
+          <path d="M 190,298 H 430.6 A 4.0,4.0 0 0 1 434.6,302.0 V 316.0 A 4.0,4.0 0 0 1 430.6,320 H 190 Z" style="fill:#2a78d6"/>
+          <text x="442.6" y="313.0" class="chart-value">$97.6K</text>
+        </g>
+    </svg>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>product_id</th>
+      <th>product_name</th>
+      <th>category</th>
+      <th>brand</th>
+      <th>total_quantity_sold</th>
+      <th>total_revenue</th>
+      <th>total_profit</th>
+      <th>profit_margin_pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>PROD-0014</td>
+      <td>ProBook Flex 360</td>
+      <td>Electronics</td>
+      <td>ProBook</td>
+      <td>107</td>
+      <td>143,673.69</td>
+      <td>64,147.01</td>
+      <td>44.65</td>
+    </tr>
+    <tr>
+      <td>PROD-0016</td>
+      <td>CloudSlate X1 Carbon</td>
+      <td>Electronics</td>
+      <td>CloudSlate</td>
+      <td>106</td>
+      <td>143,496.04</td>
+      <td>57,291.54</td>
+      <td>39.93</td>
+    </tr>
+    <tr>
+      <td>PROD-0012</td>
+      <td>ProBook Air 13</td>
+      <td>Electronics</td>
+      <td>ProBook</td>
+      <td>101</td>
+      <td>137,960.83</td>
+      <td>52,010.84</td>
+      <td>37.70</td>
+    </tr>
+    <tr>
+      <td>PROD-0013</td>
+      <td>ProBook Studio Pro</td>
+      <td>Electronics</td>
+      <td>ProBook</td>
+      <td>90</td>
+      <td>124,909.07</td>
+      <td>56,562.17</td>
+      <td>45.28</td>
+    </tr>
+    <tr>
+      <td>PROD-0011</td>
+      <td>ProBook Elite 15</td>
+      <td>Electronics</td>
+      <td>ProBook</td>
+      <td>88</td>
+      <td>110,519.94</td>
+      <td>45,771.30</td>
+      <td>41.41</td>
+    </tr>
+    <tr>
+      <td>PROD-0019</td>
+      <td>CloudSlate X1 Carbon</td>
+      <td>Electronics</td>
+      <td>CloudSlate</td>
+      <td>117</td>
+      <td>105,715.37</td>
+      <td>48,243.80</td>
+      <td>45.64</td>
+    </tr>
+    <tr>
+      <td>PROD-0006</td>
+      <td>NovaPixel Galaxy S</td>
+      <td>Electronics</td>
+      <td>NovaPixel</td>
+      <td>111</td>
+      <td>103,893.07</td>
+      <td>49,883.80</td>
+      <td>48.01</td>
+    </tr>
+    <tr>
+      <td>PROD-0018</td>
+      <td>CloudSlate WorkStation Pro</td>
+      <td>Electronics</td>
+      <td>CloudSlate</td>
+      <td>85</td>
+      <td>102,465.76</td>
+      <td>41,521.61</td>
+      <td>40.52</td>
+    </tr>
+    <tr>
+      <td>PROD-0009</td>
+      <td>NovaPixel Galaxy S</td>
+      <td>Electronics</td>
+      <td>NovaPixel</td>
+      <td>144</td>
+      <td>99,445.80</td>
+      <td>41,410.92</td>
+      <td>41.64</td>
+    </tr>
+    <tr>
+      <td>PROD-0007</td>
+      <td>NovaPixel Edge Pro</td>
+      <td>Electronics</td>
+      <td>NovaPixel</td>
+      <td>141</td>
+      <td>97,628.75</td>
+      <td>37,848.98</td>
+      <td>38.77</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div class="report"><h2>Top 10 Customers by Lifetime Value</h2>
+    <svg class="chart" viewBox="0 0 640 330" width="100%" height="330"
+         preserveAspectRatio="xMinYMin meet" role="img" aria-label="Bar chart">
+      <line x1="190" y1="5.0" x2="190" y2="325.0" class="chart-baseline"/>
+      
+        <g class="chart-bar" tabindex="0"
+           data-label="Michael Houston" data-value="$79.5K">
+          <text x="180" y="25.0" text-anchor="end" class="chart-label">Michael Houston</text>
+          <path d="M 190,10 H 546.0 A 4.0,4.0 0 0 1 550.0,14.0 V 28.0 A 4.0,4.0 0 0 1 546.0,32 H 190 Z" style="fill:#1baf7a"/>
+          <text x="558.0" y="25.0" class="chart-value">$79.5K</text>
+        </g>
+        <g class="chart-bar" tabindex="0"
+           data-label="Gary Mcclure" data-value="$55.3K">
+          <text x="180" y="57.0" text-anchor="end" class="chart-label">Gary Mcclure</text>
+          <path d="M 190,42 H 436.5 A 4.0,4.0 0 0 1 440.5,46.0 V 60.0 A 4.0,4.0 0 0 1 436.5,64 H 190 Z" style="fill:#1baf7a"/>
+          <text x="448.5" y="57.0" class="chart-value">$55.3K</text>
+        </g>
+        <g class="chart-bar" tabindex="0"
+           data-label="Ariana Diaz" data-value="$54.5K">
+          <text x="180" y="89.0" text-anchor="end" class="chart-label">Ariana Diaz</text>
+          <path d="M 190,74 H 433.1 A 4.0,4.0 0 0 1 437.1,78.0 V 92.0 A 4.0,4.0 0 0 1 433.1,96 H 190 Z" style="fill:#1baf7a"/>
+          <text x="445.1" y="89.0" class="chart-value">$54.5K</text>
+        </g>
+        <g class="chart-bar" tabindex="0"
+           data-label="Nancy Holt" data-value="$48.2K">
+          <text x="180" y="121.0" text-anchor="end" class="chart-label">Nancy Holt</text>
+          <path d="M 190,106 H 404.4 A 4.0,4.0 0 0 1 408.4,110.0 V 124.0 A 4.0,4.0 0 0 1 404.4,128 H 190 Z" style="fill:#1baf7a"/>
+          <text x="416.4" y="121.0" class="chart-value">$48.2K</text>
+        </g>
+        <g class="chart-bar" tabindex="0"
+           data-label="Sharon Robinson" data-value="$48.0K">
+          <text x="180" y="153.0" text-anchor="end" class="chart-label">Sharon Robinson</text>
+          <path d="M 190,138 H 403.4 A 4.0,4.0 0 0 1 407.4,142.0 V 156.0 A 4.0,4.0 0 0 1 403.4,160 H 190 Z" style="fill:#1baf7a"/>
+          <text x="415.4" y="153.0" class="chart-value">$48.0K</text>
+        </g>
+        <g class="chart-bar" tabindex="0"
+           data-label="Anthony Odom" data-value="$45.4K">
+          <text x="180" y="185.0" text-anchor="end" class="chart-label">Anthony Odom</text>
+          <path d="M 190,170 H 391.6 A 4.0,4.0 0 0 1 395.6,174.0 V 188.0 A 4.0,4.0 0 0 1 391.6,192 H 190 Z" style="fill:#1baf7a"/>
+          <text x="403.6" y="185.0" class="chart-value">$45.4K</text>
+        </g>
+        <g class="chart-bar" tabindex="0"
+           data-label="Thomas Pearson" data-value="$44.1K">
+          <text x="180" y="217.0" text-anchor="end" class="chart-label">Thomas Pearson</text>
+          <path d="M 190,202 H 385.9 A 4.0,4.0 0 0 1 389.9,206.0 V 220.0 A 4.0,4.0 0 0 1 385.9,224 H 190 Z" style="fill:#1baf7a"/>
+          <text x="397.9" y="217.0" class="chart-value">$44.1K</text>
+        </g>
+        <g class="chart-bar" tabindex="0"
+           data-label="Edward Murphy" data-value="$44.0K">
+          <text x="180" y="249.0" text-anchor="end" class="chart-label">Edward Murphy</text>
+          <path d="M 190,234 H 385.5 A 4.0,4.0 0 0 1 389.5,238.0 V 252.0 A 4.0,4.0 0 0 1 385.5,256 H 190 Z" style="fill:#1baf7a"/>
+          <text x="397.5" y="249.0" class="chart-value">$44.0K</text>
+        </g>
+        <g class="chart-bar" tabindex="0"
+           data-label="Kelli Warren" data-value="$42.5K">
+          <text x="180" y="281.0" text-anchor="end" class="chart-label">Kelli Warren</text>
+          <path d="M 190,266 H 378.8 A 4.0,4.0 0 0 1 382.8,270.0 V 284.0 A 4.0,4.0 0 0 1 378.8,288 H 190 Z" style="fill:#1baf7a"/>
+          <text x="390.8" y="281.0" class="chart-value">$42.5K</text>
+        </g>
+        <g class="chart-bar" tabindex="0"
+           data-label="Hannah Cisneros" data-value="$41.6K">
+          <text x="180" y="313.0" text-anchor="end" class="chart-label">Hannah Cisneros</text>
+          <path d="M 190,298 H 374.3 A 4.0,4.0 0 0 1 378.3,302.0 V 316.0 A 4.0,4.0 0 0 1 374.3,320 H 190 Z" style="fill:#1baf7a"/>
+          <text x="386.3" y="313.0" class="chart-value">$41.6K</text>
+        </g>
+    </svg>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>customer_id</th>
+      <th>first_name</th>
+      <th>last_name</th>
+      <th>loyalty_tier</th>
+      <th>customer_segment</th>
+      <th>total_orders</th>
+      <th>total_spent</th>
+      <th>avg_order_value</th>
+      <th>years_as_customer</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>CUST-00369</td>
+      <td>Michael</td>
+      <td>Houston</td>
+      <td>Bronze</td>
+      <td>High Value</td>
+      <td>226</td>
+      <td>79,452.45</td>
+      <td>351.56</td>
+      <td>2.93</td>
+    </tr>
+    <tr>
+      <td>CUST-00113</td>
+      <td>Gary</td>
+      <td>Mcclure</td>
+      <td>Silver</td>
+      <td>New</td>
+      <td>136</td>
+      <td>55,288.97</td>
+      <td>406.54</td>
+      <td>4.22</td>
+    </tr>
+    <tr>
+      <td>CUST-00146</td>
+      <td>Ariana</td>
+      <td>Diaz</td>
+      <td>Bronze</td>
+      <td>At Risk</td>
+      <td>106</td>
+      <td>54,531.57</td>
+      <td>514.45</td>
+      <td>2.30</td>
+    </tr>
+    <tr>
+      <td>CUST-00465</td>
+      <td>Nancy</td>
+      <td>Holt</td>
+      <td>Bronze</td>
+      <td>Regular</td>
+      <td>110</td>
+      <td>48,203.46</td>
+      <td>438.21</td>
+      <td>0.78</td>
+    </tr>
+    <tr>
+      <td>CUST-00454</td>
+      <td>Sharon</td>
+      <td>Robinson</td>
+      <td>Silver</td>
+      <td>Churned</td>
+      <td>108</td>
+      <td>47,985.61</td>
+      <td>444.31</td>
+      <td>1.91</td>
+    </tr>
+    <tr>
+      <td>CUST-00185</td>
+      <td>Anthony</td>
+      <td>Odom</td>
+      <td>Platinum</td>
+      <td>Regular</td>
+      <td>139</td>
+      <td>45,367.76</td>
+      <td>326.39</td>
+      <td>2.73</td>
+    </tr>
+    <tr>
+      <td>CUST-00025</td>
+      <td>Thomas</td>
+      <td>Pearson</td>
+      <td>Silver</td>
+      <td>Regular</td>
+      <td>128</td>
+      <td>44,120.76</td>
+      <td>344.69</td>
+      <td>2.60</td>
+    </tr>
+    <tr>
+      <td>CUST-00071</td>
+      <td>Edward</td>
+      <td>Murphy</td>
+      <td>Gold</td>
+      <td>At Risk</td>
+      <td>74</td>
+      <td>44,025.65</td>
+      <td>594.94</td>
+      <td>0.43</td>
+    </tr>
+    <tr>
+      <td>CUST-00165</td>
+      <td>Kelli</td>
+      <td>Warren</td>
+      <td>Gold</td>
+      <td>Regular</td>
+      <td>114</td>
+      <td>42,546.12</td>
+      <td>373.21</td>
+      <td>4.29</td>
+    </tr>
+    <tr>
+      <td>CUST-00233</td>
+      <td>Hannah</td>
+      <td>Cisneros</td>
+      <td>Silver</td>
+      <td>Regular</td>
+      <td>137</td>
+      <td>41,557.83</td>
+      <td>303.34</td>
+      <td>4.02</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div class="report"><h2>Channel & Payment Method Performance</h2>
+    <svg class="chart" viewBox="0 0 640 106" width="100%" height="106"
+         preserveAspectRatio="xMinYMin meet" role="img" aria-label="Bar chart">
+      <line x1="190" y1="5.0" x2="190" y2="101.0" class="chart-baseline"/>
+      
+        <g class="chart-bar" tabindex="0"
+           data-label="In-Store" data-value="$1.4M">
+          <text x="180" y="25.0" text-anchor="end" class="chart-label">In-Store</text>
+          <path d="M 190,10 H 546.0 A 4.0,4.0 0 0 1 550.0,14.0 V 28.0 A 4.0,4.0 0 0 1 546.0,32 H 190 Z" style="fill:#2a78d6"/>
+          <text x="558.0" y="25.0" class="chart-value">$1.4M</text>
+        </g>
+        <g class="chart-bar" tabindex="0"
+           data-label="Online" data-value="$1.2M">
+          <text x="180" y="57.0" text-anchor="end" class="chart-label">Online</text>
+          <path d="M 190,42 H 486.7 A 4.0,4.0 0 0 1 490.7,46.0 V 60.0 A 4.0,4.0 0 0 1 486.7,64 H 190 Z" style="fill:#1baf7a"/>
+          <text x="498.7" y="57.0" class="chart-value">$1.2M</text>
+        </g>
+        <g class="chart-bar" tabindex="0"
+           data-label="Mobile App" data-value="$618.1K">
+          <text x="180" y="89.0" text-anchor="end" class="chart-label">Mobile App</text>
+          <path d="M 190,74 H 342.2 A 4.0,4.0 0 0 1 346.2,78.0 V 92.0 A 4.0,4.0 0 0 1 342.2,96 H 190 Z" style="fill:#eda100"/>
+          <text x="354.2" y="89.0" class="chart-value">$618.1K</text>
+        </g>
+    </svg>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>channel</th>
+      <th>payment_method</th>
+      <th>transaction_count</th>
+      <th>total_revenue</th>
+      <th>total_profit</th>
+      <th>margin_pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>In-Store</td>
+      <td>Credit Card</td>
+      <td>1,758.00</td>
+      <td>539,741.76</td>
+      <td>251,223.43</td>
+      <td>46.55</td>
+    </tr>
+    <tr>
+      <td>Online</td>
+      <td>Credit Card</td>
+      <td>1,381.00</td>
+      <td>468,095.66</td>
+      <td>215,273.10</td>
+      <td>45.99</td>
+    </tr>
+    <tr>
+      <td>In-Store</td>
+      <td>Debit Card</td>
+      <td>1,135.00</td>
+      <td>365,829.42</td>
+      <td>167,805.01</td>
+      <td>45.87</td>
+    </tr>
+    <tr>
+      <td>Online</td>
+      <td>Debit Card</td>
+      <td>854.00</td>
+      <td>278,571.52</td>
+      <td>125,241.11</td>
+      <td>44.96</td>
+    </tr>
+    <tr>
+      <td>Mobile App</td>
+      <td>Credit Card</td>
+      <td>781.00</td>
+      <td>253,602.69</td>
+      <td>117,159.95</td>
+      <td>46.20</td>
+    </tr>
+    <tr>
+      <td>Online</td>
+      <td>PayPal</td>
+      <td>609.00</td>
+      <td>229,197.58</td>
+      <td>105,185.81</td>
+      <td>45.89</td>
+    </tr>
+    <tr>
+      <td>In-Store</td>
+      <td>PayPal</td>
+      <td>670.00</td>
+      <td>219,405.47</td>
+      <td>102,133.20</td>
+      <td>46.55</td>
+    </tr>
+    <tr>
+      <td>In-Store</td>
+      <td>Apple Pay</td>
+      <td>547.00</td>
+      <td>154,930.62</td>
+      <td>72,203.76</td>
+      <td>46.60</td>
+    </tr>
+    <tr>
+      <td>Mobile App</td>
+      <td>Debit Card</td>
+      <td>482.00</td>
+      <td>152,253.37</td>
+      <td>69,883.54</td>
+      <td>45.90</td>
+    </tr>
+    <tr>
+      <td>In-Store</td>
+      <td>Cash</td>
+      <td>427.00</td>
+      <td>144,393.33</td>
+      <td>65,272.84</td>
+      <td>45.20</td>
+    </tr>
+    <tr>
+      <td>Online</td>
+      <td>Apple Pay</td>
+      <td>294.00</td>
+      <td>113,360.94</td>
+      <td>51,455.53</td>
+      <td>45.39</td>
+    </tr>
+    <tr>
+      <td>Online</td>
+      <td>Cash</td>
+      <td>317.00</td>
+      <td>100,561.48</td>
+      <td>46,984.45</td>
+      <td>46.72</td>
+    </tr>
+    <tr>
+      <td>Mobile App</td>
+      <td>PayPal</td>
+      <td>322.00</td>
+      <td>98,008.46</td>
+      <td>45,643.26</td>
+      <td>46.57</td>
+    </tr>
+    <tr>
+      <td>Mobile App</td>
+      <td>Cash</td>
+      <td>230.00</td>
+      <td>65,435.32</td>
+      <td>30,879.73</td>
+      <td>47.19</td>
+    </tr>
+    <tr>
+      <td>Mobile App</td>
+      <td>Apple Pay</td>
+      <td>193.00</td>
+      <td>48,820.99</td>
+      <td>22,536.86</td>
+      <td>46.16</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div class="report"><h2>Data Quality Summary (last 30 loads)</h2>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>load_date</th>
+      <th>total_rows_loaded</th>
+      <th>pct_unknown_customers</th>
+      <th>pct_unknown_products</th>
+      <th>pct_negative_margin</th>
+      <th>total_revenue</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2026-07-09</td>
+      <td>10000</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>3,232,208.61</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div id="chart-tooltip" class="chart-tooltip"></div>
+<script>
+(function () {
+  var tooltip = document.getElementById('chart-tooltip');
+  function showTip(x, y, html) {
+    tooltip.innerHTML = html;
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = (y - 10) + 'px';
+    tooltip.style.opacity = '1';
+  }
+  function hideTip() { tooltip.style.opacity = '0'; }
+
+  document.querySelectorAll('.chart-bar').forEach(function (bar) {
+    function onEnter() {
+      var rect = bar.getBoundingClientRect();
+      showTip(rect.right, rect.top, '<strong>' + bar.dataset.value + '</strong> — ' + bar.dataset.label);
+    }
+    bar.addEventListener('mouseenter', onEnter);
+    bar.addEventListener('focus', onEnter);
+    bar.addEventListener('mouseleave', hideTip);
+    bar.addEventListener('blur', hideTip);
+  });
+
+  document.querySelectorAll('.chart-wrap').forEach(function (wrap) {
+    var svg = wrap.querySelector('svg');
+    var crosshair = svg.querySelector('.chart-crosshair');
+    svg.querySelectorAll('.chart-hit').forEach(function (hit) {
+      hit.addEventListener('mouseenter', function () { crosshair.style.opacity = '1'; });
+      hit.addEventListener('mouseleave', function () { crosshair.style.opacity = '0'; hideTip(); });
+      hit.addEventListener('mousemove', function (e) {
+        var x = hit.getAttribute('data-x');
+        crosshair.setAttribute('x1', x);
+        crosshair.setAttribute('x2', x);
+        var rows = ['<strong>' + hit.dataset.cat + '</strong>'];
+        for (var key in hit.dataset) {
+          if (/^s\d+$/.test(key)) rows.push(hit.dataset[key]);
+        }
+        showTip(e.clientX, e.clientY, rows.join('<br>'));
+      });
+    });
+  });
+})();
+</script>
+</body></html>
