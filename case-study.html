@@ -538,9 +538,10 @@
       <div class="schema-card fact">
         <div class="schema-kind">CLI</div>
         <div class="schema-name">reports/generate.py</div>
-        <p>One command, <code>python -m reports.generate</code>, writes five CSVs plus an HTML summary. The same views are exactly what a BI tool like Power BI or Looker would connect to directly.</p>
+        <p>One command, <code>python -m reports.generate</code>, writes five CSVs plus an HTML summary with interactive SVG charts (revenue trend, top products, top customers, channel performance) alongside every table. The same views are exactly what a BI tool like Power BI or Looker would connect to directly.</p>
       </div>
     </div>
+    <p class="lede" style="margin-top:18px;"><a href="https://claude.ai/code/artifact/567c9206-dcfe-49b3-b53d-72a6a2183069">See a live sample of the generated report &rarr;</a></p>
   </section>
 
   <section class="reveal">
@@ -635,10 +636,11 @@
           <tr><td>test_load.py</td><td>Regressions for cases 1, 2 &amp; dedup</td><td class="num">4</td><td>Yes</td></tr>
           <tr><td>test_pipeline_integration.py</td><td>Full run, idempotency, regression for case 3</td><td class="num">3</td><td>Yes</td></tr>
           <tr><td>test_reports.py</td><td>View refresh &amp; report queries, regression for case 5</td><td class="num">2</td><td>Yes</td></tr>
+          <tr><td>test_charts.py</td><td>SVG bar/line chart generation, formatting</td><td class="num">6</td><td>No</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="lede" style="margin-top:18px;">All 21 currently <span class="pass">PASS</span>. GitHub Actions runs the full suite against a throwaway Postgres service on every push, then does a real end-to-end pipeline run plus report generation as a smoke test.</p>
+    <p class="lede" style="margin-top:18px;">All 27 currently <span class="pass">PASS</span>. GitHub Actions runs the full suite against a throwaway Postgres service on every push, then does a real end-to-end pipeline run plus report generation as a smoke test.</p>
   </section>
 
   <section class="reveal">
