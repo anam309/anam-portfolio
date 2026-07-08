@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Anam Shahzad · Data Engineer</title>
+<meta name="description" content="Anam Shahzad · Data Engineer building pipelines, warehouses, and analytics on AWS, Power BI, and Looker." />
+<style>
+  :root {
+    --ground: #eef1f3;
+    --surface: #ffffff;
+    --surface-sunken: #e4e9ec;
+    --ink: #10161c;
+    --ink-soft: #48555f;
+    --ink-faint: #7c8993;
+    --line: #ccd4d9;
+    --blueprint: #17436d;
+    --blueprint-deep: #0d2c49;
+    --blueprint-line: #7fb0d8;
+    --blueprint-line-soft: rgba(127, 176, 216, 0.35);
+    --accent: #bd6a1f;
+    --accent-ink: #7c4611;
+    --on-blueprint: #eaf1f7;
+    --on-blueprint-soft: #a9c3d8;
+    --grotesk: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+
+  /* This portfolio commits to a single light theme by design.
+     It does not follow system/viewer dark-mode preference. */
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--grotesk);
+    font-size: 16.5px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--blueprint-line); color: var(--blueprint-deep); }
+  a { color: var(--blueprint); }
+  a:hover { color: var(--accent-ink); }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  img { max-width: 100%; }
+
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 28px; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  /* ── Nav ────────────────────────────────────────────────────────── */
+  nav.top {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: color-mix(in srgb, var(--ground) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .mark {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mark .dot { width: 8px; height: 8px; background: var(--accent); display: inline-block; }
+  .nav-links { display: flex; gap: 22px; align-items: center; }
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    text-decoration: none;
+  }
+  .nav-links a:hover { color: var(--accent-ink); }
+  @media (max-width: 620px) { .nav-links { display: none; } }
+
+  /* ── Hero ───────────────────────────────────────────────────────── */
+  .hero {
+    background:
+      linear-gradient(var(--blueprint-line-soft) 1px, transparent 1px) 0 0 / 28px 28px,
+      linear-gradient(90deg, var(--blueprint-line-soft) 1px, transparent 1px) 0 0 / 28px 28px,
+      linear-gradient(160deg, var(--blueprint-deep), var(--blueprint));
+    color: var(--on-blueprint);
+    position: relative;
+    padding: 96px 0 84px;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 18px;
+    border: 1px solid var(--blueprint-line-soft);
+    pointer-events: none;
+  }
+  .hero .wrap { position: relative; }
+  .hero .role-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--on-blueprint-soft);
+    border: 1px solid var(--blueprint-line-soft);
+    padding: 5px 12px;
+    margin-bottom: 26px;
+  }
+  h1.name {
+    font-family: var(--grotesk);
+    font-weight: 800;
+    font-size: clamp(2.4rem, 6vw, 3.8rem);
+    letter-spacing: -0.02em;
+    line-height: 1.03;
+    margin: 0 0 20px;
+    text-wrap: balance;
+  }
+  .hero .pitch {
+    max-width: 56ch;
+    font-size: 1.15rem;
+    color: var(--on-blueprint-soft);
+    margin: 0 0 36px;
+    text-wrap: balance;
+  }
+  .hero .pitch b { color: var(--on-blueprint); font-weight: 600; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 46px; }
+  .btn {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    padding: 12px 20px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1.5px solid var(--on-blueprint-soft);
+    color: var(--on-blueprint);
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #1c1002; font-weight: 700; }
+  .btn.primary:hover { background: var(--accent-ink); border-color: var(--accent-ink); color: #1c1002; }
+  .btn:not(.primary):hover { background: rgba(255,255,255,0.08); color: var(--on-blueprint); }
+
+  .title-block {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--blueprint-line-soft);
+    padding-top: 22px;
+  }
+  .title-block div + div { border-left: 1px solid var(--blueprint-line-soft); padding-left: 20px; }
+  .title-block .k {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--on-blueprint-soft);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .title-block .v { font-size: 0.92rem; color: var(--on-blueprint); }
+  @media (max-width: 640px) {
+    .title-block { grid-template-columns: 1fr; gap: 14px; }
+    .title-block div + div { border-left: none; padding-left: 0; border-top: 1px solid var(--blueprint-line-soft); padding-top: 14px; }
+  }
+
+  /* ── Sections ───────────────────────────────────────────────────── */
+  section { padding: 64px 0; border-bottom: 1px solid var(--line); }
+  section:last-of-type { border-bottom: none; }
+  .section-head { margin-bottom: 30px; }
+  .section-head .eyebrow { margin-bottom: 8px; display: block; }
+  h2 {
+    font-family: var(--grotesk);
+    font-weight: 800;
+    font-size: 1.7rem;
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .lede { max-width: 66ch; color: var(--ink-soft); }
+
+  /* ── About ──────────────────────────────────────────────────────── */
+  .about-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 40px; }
+  .about-grid p { color: var(--ink-soft); }
+  .about-grid p b { color: var(--ink); font-weight: 700; }
+  .about-stats { display: flex; flex-direction: column; gap: 18px; }
+  .about-stat {
+    border-left: 3px solid var(--blueprint);
+    padding: 4px 0 4px 16px;
+  }
+  .about-stat .n { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; font-variant-numeric: tabular-nums; display: block; }
+  .about-stat .l { font-size: 0.82rem; color: var(--ink-faint); }
+  @media (max-width: 700px) { .about-grid { grid-template-columns: 1fr; } }
+
+  /* ── Experience timeline ────────────────────────────────────────── */
+  .timeline { position: relative; padding-left: 26px; }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 5px; top: 6px; bottom: 6px;
+    width: 1px;
+    background: var(--line);
+  }
+  .role { position: relative; padding-bottom: 34px; }
+  .role:last-child { padding-bottom: 0; }
+  .role::before {
+    content: "";
+    position: absolute;
+    left: -26px; top: 5px;
+    width: 11px; height: 11px;
+    background: var(--surface);
+    border: 2px solid var(--blueprint);
+  }
+  .role.current::before { background: var(--accent); border-color: var(--accent); }
+  .role-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 14px;
+    margin-bottom: 4px;
+  }
+  .role-title { font-weight: 700; font-size: 1.05rem; }
+  .role-org { color: var(--blueprint); font-weight: 600; }
+  .role-dates {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+  .role ul { margin: 8px 0 0; padding-left: 18px; color: var(--ink-soft); }
+  .role li { margin-bottom: 4px; }
+  .role.earlier { opacity: 0.82; }
+
+  /* ── Skills ─────────────────────────────────────────────────────── */
+  .skill-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 26px; margin-top: 8px; }
+  .skill-group .g-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    margin-bottom: 12px;
+  }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    padding: 6px 11px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+  }
+
+  /* ── Featured project ───────────────────────────────────────────── */
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 32px;
+  }
+  .project-card .p-eyebrow {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px; flex-wrap: wrap; gap: 8px;
+  }
+  .project-card h3 { font-family: var(--grotesk); font-size: 1.35rem; margin: 0 0 12px; letter-spacing: -0.01em; }
+  .project-card > p { color: var(--ink-soft); max-width: 68ch; }
+  .principle-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px 20px; margin: 22px 0; }
+  .principle {
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    padding-left: 14px;
+    border-left: 2px solid var(--blueprint-line);
+  }
+  .principle b { color: var(--ink); display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 2px; }
+  .project-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+  .project-links a {
+    font-family: var(--mono);
+    font-size: 13px;
+    text-decoration: none;
+    color: var(--blueprint);
+    border-bottom: 1px solid var(--blueprint-line);
+    padding-bottom: 2px;
+  }
+  .project-links a:hover { color: var(--accent-ink); border-color: var(--accent-ink); }
+
+  /* ── Education ──────────────────────────────────────────────────── */
+  .edu-list { display: flex; flex-direction: column; gap: 20px; }
+  .edu-item { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 18px; }
+  .edu-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .edu-item .school { font-weight: 700; }
+  .edu-item .deg { color: var(--ink-soft); font-size: 0.92rem; }
+  .edu-item .when { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); white-space: nowrap; }
+  .edu-badge {
+    display: inline-block;
+    margin-top: 4px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+  }
+
+  /* ── Contact / footer ───────────────────────────────────────────── */
+  .contact-block {
+    background: linear-gradient(160deg, var(--blueprint-deep), var(--blueprint));
+    color: var(--on-blueprint);
+    padding: 64px 0;
+  }
+  .contact-block h2 { color: var(--on-blueprint); }
+  .contact-block .lede { color: var(--on-blueprint-soft); }
+  .contact-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+  .contact-actions .btn { border-color: var(--on-blueprint-soft); }
+  footer.site-foot {
+    padding: 24px 0 40px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink-faint);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  }
+  footer.site-foot a { color: var(--ink-faint); }
+  footer.site-foot a:hover { color: var(--accent-ink); }
+
+  /* ── Reveal ─────────────────────────────────────────────────────── */
+  .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="nav-inner">
+    <a class="mark" href="#top"><span class="dot"></span>ANAM SHAHZAD</a>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#experience">Experience</a>
+      <a href="#skills">Skills</a>
+      <a href="#project">Project</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="role-tag">Data Engineer &middot; Pipelines, Warehouses &amp; Analytics</span>
+    <h1 class="name">Anam Shahzad</h1>
+    <p class="pitch">I build data pipelines and warehouses that hold up under real production load (on <b>AWS</b>, with <b>PySpark</b> and SQL), plus the <b>Power BI</b> / <b>Looker</b> dashboards that turn them into decisions people actually act on.</p>
+    <div class="hero-actions">
+      <a class="btn primary" href="mailto:anamshahzadkhan309@gmail.com">Email me</a>
+      <a class="btn" href="https://github.com/anam309">GitHub ↗</a>
+      <a class="btn" href="https://linkedin.com/in/anam-shahzad-khan">LinkedIn ↗</a>
+      <a class="btn" href="Anam_Shahzad_Resume.pdf" download>Download résumé</a>
+    </div>
+    <div class="title-block">
+      <div><span class="k">Currently</span><span class="v">Data Engineer, Dubizzle Labs</span></div>
+      <div><span class="k">Based in</span><span class="v">Lahore, Pakistan</span></div>
+      <div><span class="k">Stack</span><span class="v">AWS &middot; PySpark &middot; SQL &middot; Power BI &middot; Looker</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="reveal" id="about">
+    <div class="section-head">
+      <span class="eyebrow">About</span>
+      <h2>Engineering-first, decision-focused</h2>
+    </div>
+    <div class="about-grid">
+      <p>
+        I'm a Computer Engineering gold medalist (UET Lahore, top of my graduating class) currently designing
+        distributed streaming pipelines across marketplace platforms at <b>Dubizzle Labs</b>. Before that, I built
+        AWS-based ingestion pipelines at RevCloud and ran Power BI-driven ETL work at Techlogix, so I've sat on
+        both sides of the handoff: the pipeline that has to be correct, and the dashboard that has to be trusted.
+      </p>
+      <p>
+        Outside delivery work, I built a 2,000+ member internship &amp; careers community at ACM UET and led
+        outreach for Google Developer Student Clubs. The same instinct that makes me over-document a pipeline's
+        data-quality rules also makes me over-communicate with the people relying on its output.
+      </p>
+    </div>
+  </section>
+
+  <section class="reveal" id="experience">
+    <div class="section-head">
+      <span class="eyebrow">Experience</span>
+      <h2>Where I've built this</h2>
+    </div>
+    <div class="timeline">
+
+      <div class="role current">
+        <div class="role-head">
+          <span class="role-title">Data Engineer</span>
+          <span class="role-org">Dubizzle Labs</span>
+          <span class="role-dates">May 2026 - Present</span>
+        </div>
+        <ul>
+          <li>Design, optimize, and maintain data architectures and distributed streaming pipelines across marketplace platforms.</li>
+          <li>Collaborate with engineering teams to streamline data accessibility and backend infrastructure scalability.</li>
+        </ul>
+      </div>
+
+      <div class="role">
+        <div class="role-head">
+          <span class="role-title">Data Engineer</span>
+          <span class="role-org">RevCloud</span>
+          <span class="role-dates">Sep 2025 - Apr 2026</span>
+        </div>
+        <ul>
+          <li>Developed and optimized scalable data pipelines using AWS (S3, Glue, Redshift) for ingestion and transformation.</li>
+          <li>Designed ETL workflows with PySpark and ran large-scale analysis to deliver actionable business insight.</li>
+        </ul>
+      </div>
+
+      <div class="role">
+        <div class="role-head">
+          <span class="role-title">Software Engineer, Data Engineering</span>
+          <span class="role-org">Techlogix</span>
+          <span class="role-dates">Jun 2025 - Sep 2025</span>
+        </div>
+        <ul>
+          <li>Maintained and optimized data pipelines using SSIS for efficient data processing.</li>
+          <li>Designed ETL workflows and built Power BI analysis to drive business decisions.</li>
+        </ul>
+      </div>
+
+      <div class="role earlier">
+        <div class="role-head">
+          <span class="role-title">Data Engineering Intern</span>
+          <span class="role-org">Techlogix</span>
+          <span class="role-dates">Jun 2024 - May 2025</span>
+        </div>
+        <ul>
+          <li>Identified data inconsistencies and resolved them via CRUD operations in PostgreSQL for validation and correction.</li>
+        </ul>
+      </div>
+
+      <div class="role earlier">
+        <div class="role-head">
+          <span class="role-title">Assistant .NET Programmer</span>
+          <span class="role-org">Camco Mfg</span>
+          <span class="role-dates">May 2023 - May 2024</span>
+        </div>
+        <ul>
+          <li>Debugged .NET applications in C# and optimized complex SQL Server queries for database-driven performance.</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="reveal" id="skills">
+    <div class="section-head">
+      <span class="eyebrow">Skills</span>
+      <h2>What I reach for</h2>
+    </div>
+    <div class="skill-groups">
+      <div class="skill-group">
+        <div class="g-title">Data Engineering</div>
+        <div class="chip-row">
+          <span class="chip">AWS Glue</span><span class="chip">Amazon S3</span><span class="chip">Amazon Athena</span>
+          <span class="chip">Redshift</span><span class="chip">PySpark</span><span class="chip">SSIS</span>
+          <span class="chip">ETL / ELT design</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="g-title">Business Analytics &amp; BI</div>
+        <div class="chip-row">
+          <span class="chip">Power BI</span><span class="chip">Looker</span><span class="chip">SQL</span>
+          <span class="chip">Dashboarding</span><span class="chip">Data storytelling</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="g-title">Databases &amp; Platforms</div>
+        <div class="chip-row">
+          <span class="chip">PostgreSQL</span><span class="chip">SQL Server</span><span class="chip">Flask</span><span class="chip">.NET / C#</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="g-title">Core</div>
+        <div class="chip-row">
+          <span class="chip">Strategic problem-solving</span><span class="chip">Process optimization</span><span class="chip">Cross-functional collaboration</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="reveal" id="project">
+    <div class="section-head">
+      <span class="eyebrow">Featured project</span>
+      <h2>Retail Analytics Platform</h2>
+    </div>
+    <div class="project-card">
+      <div class="p-eyebrow">
+        <span class="eyebrow">Python &middot; PostgreSQL &middot; pandas &middot; SQLAlchemy</span>
+        <span class="eyebrow">Personal build</span>
+      </div>
+      <h3>A dimensional warehouse for retail transactions, with reporting on top</h3>
+      <p>
+        An end-to-end ETL pipeline that takes raw customer/product/sales extracts and turns them into a proper
+        star schema: two SCD Type 2 dimensions with full change history, a fact table with pre-computed margin,
+        and a data-quality framework that logs every rejected row instead of silently dropping it. Every run
+        writes its own audit record (status, row counts, duration) and refreshes the materialized views behind
+        a small business-reporting layer, so the pipeline's history is queryable and its output is report-ready,
+        not just loaded.
+      </p>
+      <div class="principle-grid">
+        <div class="principle"><b>SCD Type 2 modeling</b>Customer &amp; product history preserved on every change, not overwritten.</div>
+        <div class="principle"><b>Idempotent loads</b>Safe to rerun the same batch: hash comparison + dedup pre-filters, not just hope.</div>
+        <div class="principle"><b>Data quality framework</b>Six rejection categories, every failure logged with the full source row as JSON.</div>
+        <div class="principle"><b>Business reporting</b>Revenue trend, top products, customer LTV, and channel performance, refreshed on every run and exported to CSV/HTML.</div>
+        <div class="principle"><b>Pipeline observability</b>An ETL audit log tracks status, row counts, and duration for every run.</div>
+        <div class="principle"><b>Containerized &amp; tested</b>Docker Compose for local setup, 21 pytest tests, CI on GitHub Actions.</div>
+        <div class="principle"><b>Debugged against reality</b>Five real bugs found and fixed by actually running it against Postgres: documented, not hidden.</div>
+      </div>
+      <div class="project-links">
+        <a href="https://claude.ai/code/artifact/919860c4-7088-4b73-b79b-a5798ff672c9">Read the full case study →</a>
+        <a href="https://github.com/anam309/retail-analytics-platform">View source on GitHub →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="reveal" id="education">
+    <div class="section-head">
+      <span class="eyebrow">Education &amp; certifications</span>
+      <h2>Record</h2>
+    </div>
+    <div class="edu-list">
+      <div class="edu-item">
+        <div>
+          <div class="school">University of Engineering and Technology (UET), Lahore</div>
+          <div class="deg">B.Sc. Computer Engineering, CGPA 3.9</div>
+          <span class="edu-badge">Gold Medalist, top of graduating class</span>
+        </div>
+        <div class="when">Nov 2021 - May 2025</div>
+      </div>
+      <div class="edu-item">
+        <div>
+          <div class="school">Kinnaird College for Women, Lahore</div>
+          <div class="deg">Intermediate, Computer Science (100% marks)</div>
+          <span class="edu-badge">Punjab Board Topper, 4-year govt. scholarship</span>
+        </div>
+        <div class="when">Sep 2019 - May 2021</div>
+      </div>
+      <div class="edu-item">
+        <div>
+          <div class="school">IELTS Academic</div>
+          <div class="deg">Overall band score: 7.5</div>
+        </div>
+        <div class="when">2025</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<section class="contact-block reveal" id="contact">
+  <div class="wrap">
+    <span class="eyebrow" style="color: var(--on-blueprint-soft);">Get in touch</span>
+    <h2 style="margin-top:8px;">Have a pipeline, warehouse, or dashboard that needs building?</h2>
+    <p class="lede">I take on data engineering and BI work, from a one-off ETL build to a full warehouse and the
+      reporting layer on top of it. Tell me what you're moving and where it needs to end up.</p>
+    <div class="contact-actions">
+      <a class="btn primary" href="mailto:anamshahzadkhan309@gmail.com">anamshahzadkhan309@gmail.com</a>
+      <a class="btn" href="https://linkedin.com/in/anam-shahzad-khan">LinkedIn ↗</a>
+      <a class="btn" href="https://github.com/anam309">GitHub ↗</a>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <footer class="site-foot">
+    <span>&copy; 2026 Anam Shahzad</span>
+    <span><a href="Anam_Shahzad_Resume.pdf" download>Résumé (PDF)</a></span>
+  </footer>
+</div>
+
+<script>
+  var els = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.08 });
+    els.forEach(function (el) { io.observe(el); });
+  } else {
+    els.forEach(function (el) { el.classList.add('in'); });
+  }
+</script>
+</body>
+</html>
