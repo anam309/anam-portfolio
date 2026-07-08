@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Retail Analytics Platform · Pipeline Manifest</title>
+<meta name="description" content="Case study: a Python + PostgreSQL ETL pipeline with SCD Type 2 history, a data-quality framework, business reporting, and five real bugs found and fixed." />
+<style>
+  :root {
+    --ground: #d9dad2;
+    --ground-line: #c6c8bd;
+    --surface: #f1f0e8;
+    --surface-raised: #f8f7f0;
+    --ink: #1d2320;
+    --ink-soft: #4b534e;
+    --ink-faint: #7a8179;
+    --accent: #b9791f;
+    --accent-ink: #6e4c12;
+    --accent-surface: #ecdcb8;
+    --rail: #2f5b74;
+    --rail-surface: #dbe6ea;
+    --stamp-red: #a83828;
+    --stamp-red-surface: #ecd8d2;
+    --stamp-green: #48713f;
+    --stamp-green-surface: #dde6da;
+    --hazard: repeating-linear-gradient(135deg, var(--accent) 0 10px, var(--ink) 10px 20px);
+    --shadow: 0 1px 0 rgba(0,0,0,0.06);
+    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+    --display: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+
+  /* This case study commits to a single light theme by design.
+     It does not follow system/viewer dark-mode preference. */
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--accent); color: #1d2320; }
+
+  a { color: var(--rail); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:hover { color: var(--accent-ink); }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--rail); outline-offset: 2px; }
+
+  .sheet {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+  }
+
+  /* ── Header / manifest stamp ───────────────────────────────────── */
+  .letterhead {
+    padding: 56px 24px 40px;
+    border-bottom: 3px solid var(--ink);
+    background: var(--surface);
+  }
+  .letterhead-inner {
+    max-width: 920px;
+    margin: 0 auto;
+  }
+  .dock-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    border: 1px solid var(--ink-faint);
+    padding: 4px 10px;
+    margin-bottom: 22px;
+  }
+  .dock-tag b { color: var(--accent-ink); font-weight: 700; }
+  h1.title {
+    font-family: var(--display);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    font-size: clamp(2.1rem, 5vw, 3.4rem);
+    line-height: 1.02;
+    margin: 0 0 18px;
+    text-wrap: balance;
+  }
+  .tagline {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--ink-soft);
+    max-width: 62ch;
+    margin: 0 0 28px;
+    text-wrap: balance;
+  }
+  .route {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink);
+    margin-bottom: 28px;
+  }
+  .route .stop { padding: 3px 9px; background: var(--surface-raised); border: 1px solid var(--ground-line); }
+  .route .arrow { color: var(--ink-faint); }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; }
+  .btn {
+    font-family: var(--mono);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 11px 18px;
+    border: 1.5px solid var(--ink);
+    color: var(--ink);
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #1d1400; font-weight: 700; }
+  .btn.primary:hover { background: var(--accent-ink); border-color: var(--accent-ink); color: var(--accent-surface); }
+  .btn:not(.primary):hover { background: var(--surface-raised); color: var(--ink); }
+
+  /* ── Sections ───────────────────────────────────────────────────── */
+  section { padding: 52px 0; border-bottom: 1px solid var(--ground-line); }
+  section:last-of-type { border-bottom: none; }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .section-tag {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+  h2 {
+    font-family: var(--display);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 1.5rem;
+    letter-spacing: 0.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .lede { max-width: 66ch; color: var(--ink-soft); }
+  .lede a { color: var(--rail); }
+
+  /* ── Stat strip ─────────────────────────────────────────────────── */
+  .stat-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1px;
+    background: var(--ground-line);
+    border: 1px solid var(--ground-line);
+    margin-top: 28px;
+  }
+  .stat {
+    background: var(--surface);
+    padding: 18px 16px;
+  }
+  .stat .n {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--ink);
+    display: block;
+  }
+  .stat .l {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-faint);
+  }
+
+  /* ── Pipeline diagram ───────────────────────────────────────────── */
+  .pipeline {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin-top: 32px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .stage {
+    flex: 1 1 0;
+    min-width: 190px;
+    background: var(--surface);
+    border: 1.5px solid var(--ink);
+    padding: 18px 16px;
+    position: relative;
+  }
+  .stage + .stage { margin-left: 22px; }
+  .stage + .stage::before {
+    content: "";
+    position: absolute;
+    left: -23px;
+    top: 50%;
+    width: 0;
+    height: 0;
+    transform: translateY(-50%);
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+    border-left: 9px solid var(--ink);
+  }
+  .stage .no {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent-ink);
+    letter-spacing: 0.08em;
+  }
+  .stage h3 {
+    font-family: var(--display);
+    text-transform: uppercase;
+    font-size: 1rem;
+    margin: 6px 0 8px;
+    letter-spacing: 0.02em;
+  }
+  .stage p { font-size: 0.88rem; color: var(--ink-soft); margin: 0; }
+
+  /* ── Schema diagram ─────────────────────────────────────────────── */
+  .schema {
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .schema-card {
+    border: 1.5px solid var(--ink);
+    background: var(--surface);
+    padding: 16px;
+  }
+  .schema-card.fact {
+    grid-column: 1 / -1;
+    background: var(--accent-surface);
+    border-color: var(--accent-ink);
+  }
+  .schema-kind {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+  }
+  .schema-card.fact .schema-kind { color: var(--accent-ink); }
+  .schema-name { font-family: var(--mono); font-weight: 700; font-size: 0.95rem; margin: 4px 0 6px; }
+  .schema-card p { margin: 0; font-size: 0.85rem; color: var(--ink-soft); }
+  @media (max-width: 640px) { .schema { grid-template-columns: 1fr; } }
+
+  /* ── DQ tag grid ─────────────────────────────────────────────────── */
+  .tag-grid {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 12px;
+  }
+  .tag-card {
+    border-left: 3px solid var(--rail);
+    background: var(--surface);
+    padding: 12px 14px;
+  }
+  .tag-card .code {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--rail);
+    letter-spacing: 0.02em;
+  }
+  .tag-card p { margin: 4px 0 0; font-size: 0.85rem; color: var(--ink-soft); }
+
+  /* ── Incident log ───────────────────────────────────────────────── */
+  .ticket {
+    background: var(--surface);
+    border: 1px solid var(--ground-line);
+    padding: 20px 22px;
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 16px 20px;
+    align-items: start;
+  }
+  .stamp {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--stamp-green);
+    border: 2px solid var(--stamp-green);
+    padding: 5px 9px;
+    transform: rotate(-4deg);
+    white-space: nowrap;
+    justify-self: start;
+  }
+  .ticket-case {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .ticket h3 {
+    font-family: var(--display);
+    font-size: 1.05rem;
+    margin: 0 0 8px;
+    text-wrap: balance;
+  }
+  .ticket p { margin: 0 0 8px; color: var(--ink-soft); font-size: 0.95rem; }
+  .ticket p:last-child { margin-bottom: 0; }
+  .ticket code, .lede code, .tag-card code {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    background: var(--rail-surface);
+    color: var(--rail);
+    padding: 1px 5px;
+  }
+  .fix-line {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--ink-faint);
+    border-top: 1px dashed var(--ground-line);
+    padding-top: 8px;
+    margin-top: 10px !important;
+  }
+  @media (max-width: 560px) {
+    .ticket { grid-template-columns: 1fr; }
+    .stamp { justify-self: end; }
+  }
+
+  /* ── Ledger table (tests/CI) ────────────────────────────────────── */
+  .ledger {
+    margin-top: 28px;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+  }
+  .ledger th, .ledger td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--ground-line);
+  }
+  .ledger th {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-faint);
+    font-weight: 600;
+  }
+  .ledger td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+  .ledger-wrap { overflow-x: auto; }
+  .pass { color: var(--stamp-green); font-family: var(--mono); font-weight: 700; font-size: 0.85rem; }
+
+  /* ── Stack list ─────────────────────────────────────────────────── */
+  .stack-list {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .part {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    padding: 7px 12px;
+    background: var(--surface);
+    border: 1px solid var(--ground-line);
+    color: var(--ink-soft);
+  }
+
+  /* ── Footer ─────────────────────────────────────────────────────── */
+  footer {
+    padding: 40px 24px 60px;
+    text-align: left;
+  }
+  footer .foot-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    border-top: 3px solid var(--ink);
+    padding-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-faint);
+    letter-spacing: 0.03em;
+  }
+  footer a { color: var(--ink-faint); }
+  footer a:hover { color: var(--accent-ink); }
+
+  /* ── Reveal ─────────────────────────────────────────────────────── */
+  .reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="letterhead">
+  <div class="letterhead-inner">
+    <div class="dock-tag">Case File <b>RAP-2026</b> &middot; Data Engineering</div>
+    <h1 class="title">Retail Analytics Platform</h1>
+    <p class="tagline">A Python + PostgreSQL pipeline that moves raw retail extracts into a dimensional warehouse, with SCD Type 2 history, an idempotent load path, and a data-quality framework that keeps a paper trail on every row it touches.</p>
+    <div class="route">
+      <span class="stop">data/raw/*.csv</span>
+      <span class="arrow">&rarr;</span>
+      <span class="stop">extract</span>
+      <span class="arrow">&rarr;</span>
+      <span class="stop">transform</span>
+      <span class="arrow">&rarr;</span>
+      <span class="stop">load</span>
+      <span class="arrow">&rarr;</span>
+      <span class="stop">warehouse</span>
+    </div>
+    <div class="cta-row">
+      <a class="btn primary" href="https://github.com/anam309/retail-analytics-platform">View source →</a>
+      <a class="btn" href="#incidents">Read the incident log</a>
+      <a class="btn" href="index.html">← Back to portfolio</a>
+    </div>
+  </div>
+</header>
+
+<div class="sheet">
+
+  <section class="reveal">
+    <div class="section-head">
+      <span class="section-tag">01 &middot; OVERVIEW</span>
+      <h2>What's on the manifest</h2>
+    </div>
+    <p class="lede">Three source files come in as a batch: customers, products, sales. Extract reads them with zero type coercion, so a malformed value fails loudly in transform rather than silently as a <code>NaN</code>. Transform validates, coerces, hashes, and resolves foreign keys. Load lands the batch in staging for audit, then upserts it into a proper star schema, one dimension version at a time.</p>
+    <div class="stat-strip">
+      <div class="stat"><span class="n">500</span><span class="l">Customers</span></div>
+      <div class="stat"><span class="n">100</span><span class="l">Products</span></div>
+      <div class="stat"><span class="n">10,000</span><span class="l">Sale lines</span></div>
+      <div class="stat"><span class="n">6,926</span><span class="l">Transactions</span></div>
+      <div class="stat"><span class="n">$3.37M</span><span class="l">Gross revenue</span></div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <div class="section-head">
+      <span class="section-tag">02 &middot; ROUTE</span>
+      <h2>How a batch moves through</h2>
+    </div>
+    <p class="lede">Dimensions load before facts are FK-resolved, deliberately. A customer's first purchase in the same batch as their first registration still has to find a real <code>customer_sk</code>, not fall back to the "unknown" sentinel.</p>
+    <div class="pipeline">
+      <div class="stage">
+        <div class="no">STAGE 1</div>
+        <h3>Extract</h3>
+        <p>CSV &rarr; DataFrame, every column read as <code>str</code>. No type inference, no silent NaNs.</p>
+      </div>
+      <div class="stage">
+        <div class="no">STAGE 2</div>
+        <h3>Transform</h3>
+        <p>Null checks, type coercion, range &amp; business-rule checks, SCD2 hashing.</p>
+      </div>
+      <div class="stage">
+        <div class="no">STAGE 3</div>
+        <h3>Load dims</h3>
+        <p>SCD2 upsert for <code>dim_customer</code> / <code>dim_product</code>; hash-unchanged rows are skipped.</p>
+      </div>
+      <div class="stage">
+        <div class="no">STAGE 4</div>
+        <h3>Load facts</h3>
+        <p>FK lookups now resolve against this batch's own dims; bulk insert with dedup pre-filter.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <div class="section-head">
+      <span class="section-tag">03 &middot; WAREHOUSE</span>
+      <h2>Star schema</h2>
+    </div>
+    <p class="lede">Two SCD Type 2 dimensions carry full history on every change. One static date dimension auto-extends when a transaction lands outside its pre-populated range. Every run writes its own receipt.</p>
+    <div class="schema">
+      <div class="schema-card">
+        <div class="schema-kind">Dimension &middot; SCD2</div>
+        <div class="schema-name">dim_customer</div>
+        <p>Natural key <code>customer_id</code>, surrogate <code>customer_sk</code>. Full history on name / contact / address / loyalty-tier changes.</p>
+      </div>
+      <div class="schema-card">
+        <div class="schema-kind">Dimension &middot; SCD2</div>
+        <div class="schema-name">dim_product</div>
+        <p>Natural key <code>product_id</code>, surrogate <code>product_sk</code>. Full history on name / category / price / cost changes.</p>
+      </div>
+      <div class="schema-card">
+        <div class="schema-kind">Dimension &middot; static</div>
+        <div class="schema-name">dim_date</div>
+        <p>Pre-populated 2020-2030. Auto-extends &plusmn;30 days around any date outside that range.</p>
+      </div>
+      <div class="schema-card fact">
+        <div class="schema-kind">Fact</div>
+        <div class="schema-name">fact_sales</div>
+        <p>One row per <code>(transaction_id, line_number)</code>. Pre-computed revenue, cost, and margin at load time: this month's cost changes don't retroactively rewrite last month's numbers. Deduped on <code>_stg_sale_id</code> before every insert.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="reveal" id="reporting">
+    <div class="section-head">
+      <span class="section-tag">04 &middot; REPORTING</span>
+      <h2>From warehouse to business report</h2>
+    </div>
+    <p class="lede">Three materialized views turn the star schema into business-ready reporting. Refreshed automatically at the end of every successful run, so they're never staler than the last load.</p>
+    <div class="schema">
+      <div class="schema-card">
+        <div class="schema-kind">Materialized view</div>
+        <div class="schema-name">mv_product_performance</div>
+        <p>Quantity sold, revenue, profit, and margin % per product.</p>
+      </div>
+      <div class="schema-card">
+        <div class="schema-kind">Materialized view</div>
+        <div class="schema-name">mv_customer_ltv</div>
+        <p>Order count, total spent, average order value, and tenure per customer.</p>
+      </div>
+      <div class="schema-card">
+        <div class="schema-kind">Materialized view</div>
+        <div class="schema-name">mv_channel_payment_analysis</div>
+        <p>Revenue and margin by channel and payment method, by month.</p>
+      </div>
+      <div class="schema-card fact">
+        <div class="schema-kind">CLI</div>
+        <div class="schema-name">reports/generate.py</div>
+        <p>One command, <code>python -m reports.generate</code>, writes five CSVs plus an HTML summary. The same views are exactly what a BI tool like Power BI or Looker would connect to directly.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <div class="section-head">
+      <span class="section-tag">05 &middot; INSPECTION</span>
+      <h2>Data quality framework</h2>
+    </div>
+    <p class="lede">Nothing is silently dropped. Every failed row is classified and written to <code>staging.stg_rejections</code> with the full source record as JSON.</p>
+    <div class="tag-grid">
+      <div class="tag-card"><div class="code">NULL_VIOLATION</div><p>Required field is blank or missing.</p></div>
+      <div class="tag-card"><div class="code">TYPE_ERROR</div><p>Field can't be cast to its target type.</p></div>
+      <div class="tag-card"><div class="code">RANGE_CHECK</div><p>Value outside a valid range: zero quantity, discount over gross.</p></div>
+      <div class="tag-card"><div class="code">BUSINESS_RULE</div><p>Logically impossible: a transaction dated tomorrow.</p></div>
+      <div class="tag-card"><div class="code">DUPLICATE</div><p>Row already exists in the warehouse.</p></div>
+      <div class="tag-card"><div class="code">REF_INTEGRITY</div><p>FK lookup returned no match (sales default to &minus;1 instead).</p></div>
+    </div>
+  </section>
+
+  <section class="reveal" id="incidents">
+    <div class="section-head">
+      <span class="section-tag">06 &middot; INCIDENT LOG</span>
+      <h2>Five bugs, found by actually running it</h2>
+    </div>
+    <p class="lede">A pipeline that only exists as read code is unreviewed. These surfaced by generating data and running the full load against a real Postgres instance. Each now has a regression test.</p>
+
+    <div class="ticket">
+      <div class="stamp">Resolved</div>
+      <div>
+        <div class="ticket-case">Case 1 &middot; etl/load.py</div>
+        <h3>SCD2 upsert inserted a column that doesn't exist</h3>
+        <p><code>extract.py</code> tags every row with <code>_source_file</code> for provenance. The generic <code>_scd2_upsert()</code> passed that straight through into <code>dim_customer</code> / <code>dim_product</code>, which have no such column. Every dimension load failed before anything committed.</p>
+        <p class="fix-line">FIX: filter the insert to the destination table's actual columns via <code>sqlalchemy.inspect</code>.</p>
+      </div>
+    </div>
+
+    <div class="ticket">
+      <div class="stamp">Resolved</div>
+      <div>
+        <div class="ticket-case">Case 2 &middot; retail_analytics_schema.sql</div>
+        <h3>The "unknown" sentinel had nowhere to point</h3>
+        <p><code>fact_sales.customer_sk</code> / <code>product_sk</code> default to <code>&minus;1</code> when a sale references a customer or product not yet on file. The foreign key constraints require <code>&minus;1</code> to exist as a real row. Nothing had ever seeded it, so every unresolved sale threw <code>ForeignKeyViolation</code>.</p>
+        <p class="fix-line">FIX: seed an <code>UNKNOWN</code> sentinel row in both dimensions.</p>
+      </div>
+    </div>
+
+    <div class="ticket">
+      <div class="stamp">Resolved</div>
+      <div>
+        <div class="ticket-case">Case 3 &middot; etl/load.py</div>
+        <h3>Sales were FK-resolved before their own dimensions loaded</h3>
+        <p>On a first-ever batch, a customer's first purchase and their first registration arrive together. The pipeline used to resolve sale FKs <em>before</em> loading that batch's dimension rows, so every same-batch customer and product looked unknown, 100% of the time.</p>
+        <p class="fix-line">FIX: reordered <code>run_pipeline</code> to load dimensions first, then resolve sales against them.</p>
+      </div>
+    </div>
+
+    <div class="ticket">
+      <div class="stamp">Resolved</div>
+      <div>
+        <div class="ticket-case">Case 4 &middot; generate_data.py + etl/*.py</div>
+        <h3>Unicode arrows crashed the run (Windows only)</h3>
+        <p>Log and print statements used <code>&rarr;</code> and box-drawing characters. Windows consoles default to the <code>cp1252</code> codepage, which can't encode them. The script died mid-run with <code>UnicodeEncodeError</code>, after partially writing output.</p>
+        <p class="fix-line">FIX: plain ASCII in every log/print path.</p>
+      </div>
+    </div>
+
+    <div class="ticket">
+      <div class="stamp">Resolved</div>
+      <div>
+        <div class="ticket-case">Case 5 &middot; retail_analytics_schema_v2_improvements.sql</div>
+        <h3>Materialized view refresh failed the first time anything called it</h3>
+        <p><code>REFRESH MATERIALIZED VIEW CONCURRENTLY</code> requires a unique index on the view. <code>mv_channel_payment_analysis</code> never had one. Nothing had ever actually called <code>sp_refresh_materialized_views()</code> until the reporting layer above was wired into the pipeline, which is exactly what surfaced it.</p>
+        <p class="fix-line">FIX: added a unique index on <code>(channel, payment_method, month)</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <div class="section-head">
+      <span class="section-tag">07 &middot; SIGN-OFF</span>
+      <h2>Testing &amp; CI</h2>
+    </div>
+    <p class="lede">Unit tests for the pure validation logic need no database at all. Integration tests run the real load path against Postgres and skip automatically if none is reachable.</p>
+    <div class="ledger-wrap">
+      <table class="ledger">
+        <thead>
+          <tr><th>Suite</th><th>Coverage</th><th class="num">Tests</th><th>Needs DB</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>test_transform_customers.py</td><td>Null checks, SCD2 hashing, type coercion</td><td class="num">4</td><td>No</td></tr>
+          <tr><td>test_transform_products.py</td><td>Range checks, numeric coercion, defaults</td><td class="num">4</td><td>No</td></tr>
+          <tr><td>test_transform_sales.py</td><td>FK resolution, business-rule rejection</td><td class="num">4</td><td>Yes</td></tr>
+          <tr><td>test_load.py</td><td>Regressions for cases 1, 2 &amp; dedup</td><td class="num">4</td><td>Yes</td></tr>
+          <tr><td>test_pipeline_integration.py</td><td>Full run, idempotency, regression for case 3</td><td class="num">3</td><td>Yes</td></tr>
+          <tr><td>test_reports.py</td><td>View refresh &amp; report queries, regression for case 5</td><td class="num">2</td><td>Yes</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="lede" style="margin-top:18px;">All 21 currently <span class="pass">PASS</span>. GitHub Actions runs the full suite against a throwaway Postgres service on every push, then does a real end-to-end pipeline run plus report generation as a smoke test.</p>
+  </section>
+
+  <section class="reveal">
+    <div class="section-head">
+      <span class="section-tag">08 &middot; MATERIALS</span>
+      <h2>Built with</h2>
+    </div>
+    <div class="stack-list">
+      <span class="part">Python 3.12</span>
+      <span class="part">pandas 2.x</span>
+      <span class="part">SQLAlchemy 2.x</span>
+      <span class="part">PostgreSQL 16</span>
+      <span class="part">psycopg2</span>
+      <span class="part">pytest</span>
+      <span class="part">Docker Compose</span>
+      <span class="part">GitHub Actions</span>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="foot-inner">
+    <span>Retail Analytics Platform &middot; case file RAP-2026</span>
+    <span><a href="https://github.com/anam309/retail-analytics-platform">github.com/anam309/retail-analytics-platform</a></span>
+  </div>
+</footer>
+
+<script>
+  var els = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.08 });
+    els.forEach(function (el) { io.observe(el); });
+  } else {
+    els.forEach(function (el) { el.classList.add('in'); });
+  }
+</script>
+</body>
+</html>
